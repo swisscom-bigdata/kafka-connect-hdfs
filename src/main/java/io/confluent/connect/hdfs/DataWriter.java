@@ -100,7 +100,7 @@ public class DataWriter {
       }
 
       final String formatClassCompression = connectorConfig.getString(HdfsSinkConnectorConfig.FORMAT_CLASS_COMPRESSION_CONFIG);
-      if(!StringUtils.isEmpty(formatClassCompression)) {
+      if(StringUtils.isNotEmpty(formatClassCompression)) {
         final String formatClass = connectorConfig.getString(HdfsSinkConnectorConfig.FORMAT_CLASS_CONFIG);
         switch (formatClass) {
           case "io.confluent.connect.hdfs.avro.AvroFormat":
