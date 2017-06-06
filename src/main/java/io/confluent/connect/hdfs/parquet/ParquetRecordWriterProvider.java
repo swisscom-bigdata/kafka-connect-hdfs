@@ -19,6 +19,7 @@ import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
+import org.apache.kafka.common.config.ConfigException;
 import org.apache.kafka.connect.sink.SinkRecord;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -80,9 +81,9 @@ public class ParquetRecordWriterProvider implements RecordWriterProvider {
       Class<?> compressionCodecClazz = Class.forName(compressionCodecClassName);
       return CompressionCodecName.fromCompressionCodec(compressionCodecClazz);
     } catch (ClassNotFoundException ex){
-      throw new IllegalArgumentException("invalid value for " + HdfsSinkConnectorConfig.PARQUET_COMPRESSION_CLASS_CONFIG, ex);
+      throw new ConfigException("invalid value for " + HdfsSinkConnectorConfig.PARQUET_COMPRESSION_CLASS_CONFIG);
     } catch (CompressionCodecNotSupportedException ex) {
-      throw new IllegalArgumentException("invalid value for " + HdfsSinkConnectorConfig.PARQUET_COMPRESSION_CLASS_CONFIG, ex);
+      throw new ConfigException("invalid value for " + HdfsSinkConnectorConfig.PARQUET_COMPRESSION_CLASS_CONFIG);
     }
   }
 }
