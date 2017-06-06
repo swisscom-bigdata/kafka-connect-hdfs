@@ -75,15 +75,14 @@ public class ParquetRecordWriterProvider implements RecordWriterProvider {
   }
 
   private CompressionCodecName getCompressionCodecName(Configuration conf) {
-    String compressionCodecClassName = conf.get(HdfsSinkConnectorConfig.PARQUET_COMPRESSION_CLASS_CONFIG,
-            CompressionCodecName.SNAPPY.getHadoopCompressionCodecClassName());
-    try {
-      Class<?> compressionCodecClazz = Class.forName(compressionCodecClassName);
-      return CompressionCodecName.fromCompressionCodec(compressionCodecClazz);
-    } catch (ClassNotFoundException ex){
-      throw new ConfigException("invalid value for " + HdfsSinkConnectorConfig.PARQUET_COMPRESSION_CLASS_CONFIG);
-    } catch (CompressionCodecNotSupportedException ex) {
-      throw new ConfigException("invalid value for " + HdfsSinkConnectorConfig.PARQUET_COMPRESSION_CLASS_CONFIG);
+    String compressionCodecClassName = conf.get(HdfsSinkConnectorConfig.FORMAT_CLASS_COMPRESSION_CONFIG,
+            "snappy");
+    switch(compressionCodecClassName) {
+        case "uncompressed": return CompressionCodecName.UNCOMPRESSED;
+        case "snappy": return CompressionCodecName.SNAPPY;
+        case "gzip": return CompressionCodecName.GZIP;
+        case "lzo": return CompressionCodecName.LZO;
+        default: throw new ConfigException("Invalid "+HdfsSinkConnectorConfig.FORMAT_CLASS_COMPRESSION_CONFIG+" value for parquet: "+compressionCodecClassName);
     }
   }
 }
