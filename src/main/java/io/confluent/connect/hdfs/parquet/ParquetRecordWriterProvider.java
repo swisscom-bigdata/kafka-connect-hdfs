@@ -13,13 +13,18 @@
  **/
 package io.confluent.connect.hdfs.parquet;
 
+import io.confluent.connect.hdfs.HdfsSinkConnector;
+import io.confluent.connect.hdfs.HdfsSinkConnectorConfig;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.kafka.connect.sink.SinkRecord;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.apache.parquet.avro.AvroParquetWriter;
 import org.apache.parquet.hadoop.ParquetWriter;
+import org.apache.parquet.hadoop.codec.CompressionCodecNotSupportedException;
 import org.apache.parquet.hadoop.metadata.CompressionCodecName;
 
 import java.io.IOException;
@@ -29,6 +34,8 @@ import io.confluent.connect.hdfs.RecordWriterProvider;
 import io.confluent.connect.hdfs.RecordWriter;
 
 public class ParquetRecordWriterProvider implements RecordWriterProvider {
+
+  private static final Logger log = LoggerFactory.getLogger(ParquetRecordWriterProvider.class);
 
   private final static String EXTENSION = ".parquet";
 
@@ -42,7 +49,8 @@ public class ParquetRecordWriterProvider implements RecordWriterProvider {
       Configuration conf, final String fileName, SinkRecord record, final AvroData avroData)
       throws IOException {
     final Schema avroSchema = avroData.fromConnectSchema(record.valueSchema());
-    CompressionCodecName compressionCodecName = CompressionCodecName.SNAPPY;
+
+    final CompressionCodecName compressionCodecName = getCompressionCodecName(conf);
 
     int blockSize = 256 * 1024 * 1024;
     int pageSize = 64 * 1024;
@@ -63,5 +71,18 @@ public class ParquetRecordWriterProvider implements RecordWriterProvider {
         writer.close();
       }
     };
+  }
+
+  private CompressionCodecName getCompressionCodecName(Configuration conf) {
+    String compressionCodecClassName = conf.get(HdfsSinkConnectorConfig.PARQUET_COMPRESSION_CLASS_CONFIG,
+            CompressionCodecName.SNAPPY.getHadoopCompressionCodecClassName());
+    try {
+      Class<?> compressionCodecClazz = Class.forName(compressionCodecClassName);
+      return CompressionCodecName.fromCompressionCodec(compressionCodecClazz);
+    } catch (ClassNotFoundException ex){
+      throw new IllegalArgumentException("invalid value for " + HdfsSinkConnectorConfig.PARQUET_COMPRESSION_CLASS_CONFIG, ex);
+    } catch (CompressionCodecNotSupportedException ex) {
+      throw new IllegalArgumentException("invalid value for " + HdfsSinkConnectorConfig.PARQUET_COMPRESSION_CLASS_CONFIG, ex);
+    }
   }
 }

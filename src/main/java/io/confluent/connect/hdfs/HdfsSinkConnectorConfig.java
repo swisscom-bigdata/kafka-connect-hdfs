@@ -78,6 +78,11 @@ public class HdfsSinkConnectorConfig extends AbstractConfig {
   public static final String FORMAT_CLASS_COMPRESSION_DEFAULT = "";
   private static final String FORMAT_CLASS_COMPRESSION_DISPLAY = "Format class compression";
 
+  public static final String PARQUET_COMPRESSION_CLASS_CONFIG = "parquet.compression.class";
+  private static final String PARQUET_COMPRESSION_CLASS_DOC = "The compression class to use when writing parquet files to HDFS. ";
+  private static final String PARQUET_COMPRESSION_CLASS_DEFAULT = "org.apache.parquet.hadoop.codec.SnappyCodec";
+  private static final String PARQUET_COMPRESSION_CLASS_DISPLAY = "Parquet compression class";
+
   // Hive group
   public static final String HIVE_INTEGRATION_CONFIG = "hive.integration";
   private static final String HIVE_INTEGRATION_DOC =
@@ -283,7 +288,9 @@ public class HdfsSinkConnectorConfig extends AbstractConfig {
         .define(LOGS_DIR_CONFIG, Type.STRING, LOGS_DIR_DEFAULT, Importance.HIGH, LOGS_DIR_DOC, HDFS_GROUP, 5, Width.SHORT, LOGS_DIR_DISPLAY)
         .define(FORMAT_CLASS_CONFIG, Type.STRING, FORMAT_CLASS_DEFAULT, Importance.HIGH, FORMAT_CLASS_DOC, HDFS_GROUP, 6, Width.SHORT, FORMAT_CLASS_DISPLAY)
         .define(FORMAT_CLASS_COMPRESSION_CONFIG, Type.STRING, FORMAT_CLASS_COMPRESSION_DEFAULT, Importance.LOW, FORMAT_CLASS_COMPRESSION_DOC, HDFS_GROUP, 7,
-                Width.SHORT, FORMAT_CLASS_COMPRESSION_DISPLAY);
+                Width.SHORT, FORMAT_CLASS_COMPRESSION_DISPLAY)
+        .define(PARQUET_COMPRESSION_CLASS_CONFIG, Type.STRING, PARQUET_COMPRESSION_CLASS_DEFAULT, Importance.LOW, PARQUET_COMPRESSION_CLASS_DOC, HDFS_GROUP, 8,
+                 Width.SHORT, PARQUET_COMPRESSION_CLASS_DISPLAY);
 
 
     // Define Hive configuration group
