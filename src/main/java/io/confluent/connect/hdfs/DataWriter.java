@@ -99,15 +99,24 @@ public class DataWriter {
         conf.addResource(new Path(hadoopConfDir + "/hdfs-site.xml"));
       }
 
-      final String formatClass = connectorConfig.getString(HdfsSinkConnectorConfig.FORMAT_CLASS_CONFIG);
       final String formatClassCompression = connectorConfig.getString(HdfsSinkConnectorConfig.FORMAT_CLASS_COMPRESSION_CONFIG);
-      if (StringUtils.isNotEmpty(formatClassCompression)) {
-          if (!formatClass.equals("io.confluent.connect.hdfs.avro.AvroFormat")) {
-              throw new ConfigException("Compression is only supported for format class: io.confluent.connect.hdfs.avro.AvroFormat.");
-          }
-          if (!formatClassCompression.equals("deflate") && !formatClassCompression.equals("snappy")) {
+      if(StringUtils.isNotEmpty(formatClassCompression)) {
+        final String formatClass = connectorConfig.getString(HdfsSinkConnectorConfig.FORMAT_CLASS_CONFIG);
+        switch (formatClass) {
+          case "io.confluent.connect.hdfs.avro.AvroFormat":
+            if (!formatClassCompression.equals("deflate") && !formatClassCompression.equals("snappy")) {
               throw new ConfigException("Format class compression value must be either deflate or snappy.");
-          }
+            }
+            break;
+          case "io.confluent.connect.hdfs.parquet.ParquetFormat":
+            if (!formatClassCompression.equals("snappy")
+              && !formatClassCompression.equals("gzip")
+              && !formatClassCompression.equals("lzo")
+              && !formatClassCompression.equals("uncompressed")) {
+                throw new ConfigException("Format class compression value must be either snappy, gzip, lzo or uncompressed.");
+            }
+            break;
+        }
       }
 
       boolean secureHadoop = connectorConfig.getBoolean(HdfsSinkConnectorConfig.HDFS_AUTHENTICATION_KERBEROS_CONFIG);

@@ -60,7 +60,7 @@ public class DataWriterAvroTest extends TestWithMiniDFSCluster {
   }
 
   @Test
-  public void testWriteDeflateCompressedRecord() throws Exception {
+  public void testAvroWriteDeflateCompressedRecord() throws Exception {
     Map<String, String> props = createProps();
     props.put(HdfsSinkConnectorConfig.FORMAT_CLASS_COMPRESSION_CONFIG, "deflate");
     HdfsSinkConnectorConfig connectorConfig = new HdfsSinkConnectorConfig(props);
@@ -68,7 +68,7 @@ public class DataWriterAvroTest extends TestWithMiniDFSCluster {
   }
 
   @Test
-  public void testWriteSnappyCompressedRecord() throws Exception {
+  public void testAvroWriteSnappyCompressedRecord() throws Exception {
     Map<String, String> props = createProps();
     props.put(HdfsSinkConnectorConfig.FORMAT_CLASS_COMPRESSION_CONFIG, "snappy");
     HdfsSinkConnectorConfig connectorConfig = new HdfsSinkConnectorConfig(props);

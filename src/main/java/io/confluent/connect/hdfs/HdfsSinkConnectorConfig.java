@@ -74,7 +74,9 @@ public class HdfsSinkConnectorConfig extends AbstractConfig {
 
   public static final String FORMAT_CLASS_COMPRESSION_CONFIG = "format.class.compression";
   private static final String FORMAT_CLASS_COMPRESSION_DOC =
-      "The compression to use when writing data to HDFS in the avro format. Possible values are deflate or snappy.";
+      "The compression to use when writing data to HDFS in avro or parquet format. " +
+              "Possible values for avro are deflate or snappy. Default is no compression. " +
+              "Possible values for parquet are snappy, gzip, lzo or uncompressed. Default is snappy.";
   public static final String FORMAT_CLASS_COMPRESSION_DEFAULT = "";
   private static final String FORMAT_CLASS_COMPRESSION_DISPLAY = "Format class compression";
 
