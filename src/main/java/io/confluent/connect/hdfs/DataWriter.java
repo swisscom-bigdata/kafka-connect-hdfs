@@ -396,10 +396,14 @@ public class DataWriter {
   private Format getFormat() throws ClassNotFoundException, IllegalAccessException, InstantiationException,
   NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException{
     final String className = connectorConfig.getString(HdfsSinkConnectorConfig.FORMAT_CLASS_CONFIG);
-    if (className.equals("io.confluent.connect.hdfs.avro.AvroFormat")) {
+
+    switch (className) {
+      case "io.confluent.connect.hdfs.avro.AvroFormat":
+      case "io.confluent.connect.hdfs.parquet.ParquetFormat":
         return (Format) Class.forName(className).getConstructor(HdfsSinkConnectorConfig.class).newInstance(new Object[] {connectorConfig});
+      default:
+        return ((Class<Format>) Class.forName(className)).newInstance();
     }
-    return  ((Class<Format>) Class.forName(className)).newInstance();
   }
 
   private String getPartitionValue(String path) {
