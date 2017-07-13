@@ -39,6 +39,11 @@ public class ParquetRecordWriterProvider implements RecordWriterProvider {
   private static final Logger log = LoggerFactory.getLogger(ParquetRecordWriterProvider.class);
 
   private final static String EXTENSION = ".parquet";
+  private HdfsSinkConnectorConfig connectorConfig;
+
+  public ParquetRecordWriterProvider(HdfsSinkConnectorConfig connectorConfig) {
+    this.connectorConfig = connectorConfig;
+  }
 
   @Override
   public String getExtension() {
@@ -50,8 +55,7 @@ public class ParquetRecordWriterProvider implements RecordWriterProvider {
       Configuration conf, final String fileName, SinkRecord record, final AvroData avroData)
       throws IOException {
     final Schema avroSchema = avroData.fromConnectSchema(record.valueSchema());
-
-    final CompressionCodecName compressionCodecName = getCompressionCodecName(conf);
+    final CompressionCodecName compressionCodecName = getCompressionCodecName();
 
     int blockSize = 256 * 1024 * 1024;
     int pageSize = 64 * 1024;
@@ -74,15 +78,14 @@ public class ParquetRecordWriterProvider implements RecordWriterProvider {
     };
   }
 
-  private CompressionCodecName getCompressionCodecName(Configuration conf) {
-    String compressionCodecClassName = conf.get(HdfsSinkConnectorConfig.FORMAT_CLASS_COMPRESSION_CONFIG,
-            "snappy");
-    switch(compressionCodecClassName) {
+  private CompressionCodecName getCompressionCodecName() {
+    String compressionCodec = connectorConfig.getString(HdfsSinkConnectorConfig.FORMAT_CLASS_COMPRESSION_CONFIG);
+    switch(compressionCodec) {
         case "uncompressed": return CompressionCodecName.UNCOMPRESSED;
         case "snappy": return CompressionCodecName.SNAPPY;
         case "gzip": return CompressionCodecName.GZIP;
         case "lzo": return CompressionCodecName.LZO;
-        default: throw new ConfigException("Invalid "+HdfsSinkConnectorConfig.FORMAT_CLASS_COMPRESSION_CONFIG+" value for parquet: "+compressionCodecClassName);
+        default: return CompressionCodecName.SNAPPY;
     }
   }
 }

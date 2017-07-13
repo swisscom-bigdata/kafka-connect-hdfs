@@ -48,7 +48,35 @@ public class DataWriterParquetTest extends TestWithMiniDFSCluster {
 
   @Test
   public void testWriteRecord() throws Exception {
-    DataWriter hdfsWriter = new DataWriter(connectorConfig, context, avroData);
+    testWriteRecordBase(connectorConfig);
+  }
+
+  @Test
+  public void testWriteSnappyCompressedRecord() throws Exception {
+    Map<String, String> props = createProps();
+    props.put(HdfsSinkConnectorConfig.FORMAT_CLASS_COMPRESSION_CONFIG, "snappy");
+    HdfsSinkConnectorConfig connectorConfig = new HdfsSinkConnectorConfig(props);
+    testWriteRecordBase(connectorConfig);
+  }
+
+  @Test
+  public void testWriteGzipCompressedRecord() throws Exception {
+    Map<String, String> props = createProps();
+    props.put(HdfsSinkConnectorConfig.FORMAT_CLASS_COMPRESSION_CONFIG, "gzip");
+    HdfsSinkConnectorConfig connectorConfig = new HdfsSinkConnectorConfig(props);
+    testWriteRecordBase(connectorConfig);
+  }
+
+  @Test
+  public void testWriteUncompressedRecord() throws Exception {
+    Map<String, String> props = createProps();
+    props.put(HdfsSinkConnectorConfig.FORMAT_CLASS_COMPRESSION_CONFIG, "uncompressed");
+    HdfsSinkConnectorConfig connectorConfig = new HdfsSinkConnectorConfig(props);
+    testWriteRecordBase(connectorConfig);
+  }
+
+  public void testWriteRecordBase(HdfsSinkConnectorConfig connectorConfigParam) throws Exception {
+    DataWriter hdfsWriter = new DataWriter(connectorConfigParam, context, avroData);
     Partitioner partitioner = hdfsWriter.getPartitioner();
     hdfsWriter.recover(TOPIC_PARTITION);
 
